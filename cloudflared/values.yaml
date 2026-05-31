@@ -1,5 +1,11 @@
 replicaCount: 2
 
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1
+
 image:
   repository: cloudflare/cloudflared
   pullPolicy: IfNotPresent
@@ -13,9 +19,18 @@ serviceAccount:
   enabled: true
   annotations: {}
   name: "cloudflared-sa"
+  automountServiceAccountToken: false
+
+podAnnotations: {}
+
+opentelemetry:
+  enabled: false
+  
+podLabels: {}
 
 cloudflared:
   tunnelToken: ""
+  existingSecret: ""
 
 livenessProbe:
   httpGet:
@@ -31,16 +46,59 @@ readinessProbe:
   initialDelaySeconds: 5
   periodSeconds: 10
 
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  capabilities:
+    drop: ["ALL"]
+  seccompProfile:
+    type: RuntimeDefault
+
 resources:
   requests:
     cpu: 50m
     memory: 64Mi
   limits:
-    cpu: 200m
-    memory: 128Mi
+    cpu: 800m
+    memory: 256Mi
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+terminationGracePeriodSeconds: 30
+
+networkPolicy:
+  enabled: false
+
+metrics:
+  service:
+    enabled: false
+    port: 2000
+  serviceMonitor:
+    enabled: false
+    interval: 30s
+    additionalLabels: {}
 
 nodeSelector: {}
 
 tolerations: []
 
-affinity: {}
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - cloudflared
+          topologyKey: kubernetes.io/hostname

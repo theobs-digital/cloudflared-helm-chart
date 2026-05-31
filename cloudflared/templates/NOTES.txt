@@ -1,0 +1,28 @@
+cloudflared tunnel deployed with {{ .Values.replicaCount }} replica(s).
+
+{{- if .Values.cloudflared.existingSecret }}
+Using existing secret: {{ .Values.cloudflared.existingSecret }}
+{{- else }}
+Secret created: {{ include "cloudflared.fullname" . }}-secret
+{{- end }}
+
+Check tunnel status:
+  kubectl get pods -l {{ include "cloudflared.selectorLabels" . | replace ": " "=" | replace "\n" "," }} -n {{ .Release.Namespace }}
+
+View logs:
+  kubectl logs -l {{ include "cloudflared.selectorLabels" . | replace ": " "=" | replace "\n" "," }} -n {{ .Release.Namespace }} -f
+
+Readiness endpoint:
+  The metrics server is exposed on port 2000 inside each pod.
+  Health check: GET /ready
+{{- if .Values.metrics.service.enabled }}
+
+Metrics service: {{ include "cloudflared.fullname" . }}-metrics:{{ .Values.metrics.service.port }}
+{{- if .Values.metrics.serviceMonitor.enabled }}
+ServiceMonitor enabled (interval: {{ .Values.metrics.serviceMonitor.interval }}).
+{{- end }}
+{{- end }}
+{{- if .Values.networkPolicy.enabled }}
+
+NetworkPolicy enabled (egress: QUIC/7844, HTTPS/443, DNS/53).
+{{- end }}
