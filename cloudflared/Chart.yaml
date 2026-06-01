@@ -2,7 +2,7 @@ apiVersion: v2
 name: cloudflared
 description: Helm chart for deploying Cloudflare Tunnel (cloudflared)
 type: application
-version: 0.3.0
+version: 0.3.2
 appVersion: "2026.5.2"
 keywords:
   - cloudflare
@@ -11,4 +11,8 @@ keywords:
   - ingress
 icon: https://www.cloudflare.com/favicon-128.png
 sources:
-  - https://github.com/cloudflare/cloudflared
+  - https://github.com/theobs-digital/cloudflared-helm-chart
+annotations:
+  artifacthub.io/images: |
+    - name: cloudflared
+      image: cloudflare/cloudflared:2026.5.2
