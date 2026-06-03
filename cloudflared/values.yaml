@@ -33,11 +33,11 @@ cloudflared:
   existingSecret: ""
 
 livenessProbe:
-  httpGet:
-    path: /ready
+  tcpSocket:
     port: 2000
   initialDelaySeconds: 10
-  periodSeconds: 10
+  periodSeconds: 20
+  failureThreshold: 6
 
 readinessProbe:
   httpGet:

@@ -21,6 +21,8 @@ spec:
         - protocol: UDP
           port: 7844
         - protocol: TCP
+          port: 7844
+        - protocol: TCP
           port: 443
     - to:
         - namespaceSelector: {}

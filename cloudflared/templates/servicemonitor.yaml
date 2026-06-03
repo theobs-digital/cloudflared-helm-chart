@@ -1,3 +1,6 @@
+{{- if and .Values.metrics.serviceMonitor.enabled (not .Values.metrics.service.enabled) }}
+{{- fail "metrics.serviceMonitor.enabled requires metrics.service.enabled" }}
+{{- end }}
 {{- if .Values.metrics.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
