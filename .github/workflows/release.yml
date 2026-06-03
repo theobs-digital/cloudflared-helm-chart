@@ -31,3 +31,13 @@ jobs:
           charts_dir: .
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Ensure .nojekyll on gh-pages
+        run: |
+          git checkout gh-pages
+          if [ ! -f .nojekyll ]; then
+            touch .nojekyll
+            git add .nojekyll
+            git commit -m "fix: add .nojekyll"
+            git push origin gh-pages
+          fi
