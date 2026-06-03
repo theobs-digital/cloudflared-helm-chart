@@ -24,5 +24,10 @@ ServiceMonitor enabled (interval: {{ .Values.metrics.serviceMonitor.interval }})
 {{- end }}
 {{- if .Values.networkPolicy.enabled }}
 
-NetworkPolicy enabled (egress: QUIC/7844, HTTPS/443, DNS/53).
+NetworkPolicy enabled (ingress: metrics/2000, egress: QUIC/7844, HTTPS/443, DNS/53).
+{{- if has "*" .Values.networkPolicy.allowedNamespaces }}
+Egress to all namespaces is allowed (allowedNamespaces: ["*"]).
+{{- else }}
+Egress restricted to namespaces: {{ .Values.networkPolicy.allowedNamespaces | join ", " }}
+{{- end }}
 {{- end }}

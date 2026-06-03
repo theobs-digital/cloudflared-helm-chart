@@ -4,13 +4,13 @@ A minimal, security-hardened Helm chart for deploying [Cloudflare Tunnel](https:
 
 ## Features
 
-- Security-first defaults: non-root, read-only filesystem, dropped capabilities, seccomp profile
+- Security-first defaults: non-root, read-only filesystem, writable `/tmp`, dropped capabilities, seccomp profile
 - PodDisruptionBudget for high availability
 - Zero-downtime rolling updates
 - Liveness and readiness probes via the built-in metrics server
 - Pod anti-affinity to spread replicas across nodes
 - Support for existing secrets (Vault, External Secrets, SealedSecret, etc.)
-- Optional NetworkPolicy (egress-only)
+- Optional NetworkPolicy with configurable namespace-level egress
 - Optional Prometheus metrics Service and ServiceMonitor
 - Optional OpenTelemetry annotations for automatic scraping
 
@@ -111,7 +111,7 @@ helm uninstall cloudflared -n cloudflared
 | `strategy.type` | Deployment strategy | `RollingUpdate` |
 | `strategy.rollingUpdate.maxUnavailable` | Max unavailable pods during update | `0` |
 | `strategy.rollingUpdate.maxSurge` | Max extra pods during update | `1` |
-| `podDisruptionBudget.enabled` | Enable PDB | `true` |
+| `podDisruptionBudget.enabled` | Enable PDB (auto-disabled when `replicaCount` is 1) | `true` |
 | `podDisruptionBudget.minAvailable` | Minimum available pods | `1` |
 | `terminationGracePeriodSeconds` | Grace period for pod termination | `30` |
 | `affinity` | Affinity rules (anti-affinity preferred by default) | see `values.yaml` |
@@ -138,7 +138,8 @@ helm uninstall cloudflared -n cloudflared
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `networkPolicy.enabled` | Enable NetworkPolicy (egress: QUIC/7844, HTTPS/443, DNS/53) | `false` |
+| `networkPolicy.enabled` | Enable NetworkPolicy | `false` |
+| `networkPolicy.allowedNamespaces` | Namespaces cloudflared can reach (`["*"]` for all) | `["*"]` |
 
 ### Metrics and Observability
 

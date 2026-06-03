@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.0] - 2026-06-03
+
+### Added
+- Writable `/tmp` volume (emptyDir) for readOnlyRootFilesystem compatibility
+- `networkPolicy.allowedNamespaces` to control egress to cluster backends (default: `["*"]` — all namespaces)
+- `securityContext.runAsUser` and `securityContext.runAsGroup` in default values
+
+### Fixed
+- NetworkPolicy `from: []` and `to: []` rules were silently blocking all traffic instead of allowing it
+- PodDisruptionBudget now auto-disables when `replicaCount` is 1 to avoid blocking node drains
+- Tunnel token validation uses `required` instead of a default placeholder that would fail at runtime
+
 ## [0.3.0] - 2026-05-31
 
 ### Added
@@ -32,6 +44,18 @@
 ---
 
 # Journal des modifications
+
+## [0.4.0] - 2026-06-03
+
+### Ajouts
+- Volume `/tmp` writable (emptyDir) pour compatibilite readOnlyRootFilesystem
+- `networkPolicy.allowedNamespaces` pour controler l'egress vers les backends du cluster (defaut : `["*"]` — tous les namespaces)
+- `securityContext.runAsUser` et `securityContext.runAsGroup` dans les valeurs par defaut
+
+### Corrections
+- NetworkPolicy `from: []` et `to: []` bloquaient silencieusement tout le trafic au lieu de l'autoriser
+- PodDisruptionBudget se desactive automatiquement quand `replicaCount` est 1 pour eviter de bloquer les drains de noeuds
+- Validation du tunnel token avec `required` au lieu d'un placeholder qui echouait au runtime
 
 ## [0.3.0] - 2026-05-31
 

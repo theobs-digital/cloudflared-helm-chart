@@ -55,6 +55,8 @@ securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
   capabilities:
     drop: ["ALL"]
   seccompProfile:
@@ -76,6 +78,7 @@ terminationGracePeriodSeconds: 30
 
 networkPolicy:
   enabled: false
+  allowedNamespaces: ["*"]
 
 metrics:
   service:

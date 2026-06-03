@@ -13,15 +13,11 @@ spec:
     - Ingress
     - Egress
   ingress:
-    {{- if .Values.metrics.service.enabled }}
-    - from: []
-      ports:
+    - ports:
         - protocol: TCP
-          port: {{ .Values.metrics.service.port }}
-    {{- end }}
+          port: 2000
   egress:
-    - to: []
-      ports:
+    - ports:
         - protocol: UDP
           port: 7844
         - protocol: TCP
@@ -33,4 +29,15 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
+    {{- if and .Values.networkPolicy.allowedNamespaces (has "*" .Values.networkPolicy.allowedNamespaces) }}
+    - to:
+        - namespaceSelector: {}
+    {{- else }}
+    {{- range .Values.networkPolicy.allowedNamespaces }}
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ . }}
+    {{- end }}
+    {{- end }}
 {{- end }}
