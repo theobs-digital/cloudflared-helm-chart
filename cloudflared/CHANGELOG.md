@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1] - 2026-06-03
+
+### Fixed
+- Liveness probe decoupled from readiness: uses `tcpSocket` instead of `httpGet /ready` to avoid crashloop during Cloudflare edge outages
+- Added TCP/7844 egress in NetworkPolicy for HTTP/2 fallback
+- ServiceMonitor now fails at install if `metrics.service.enabled` is not set
+
 ## [0.4.0] - 2026-06-03
 
 ### Added
@@ -44,6 +51,13 @@
 ---
 
 # Journal des modifications
+
+## [0.4.1] - 2026-06-03
+
+### Corrections
+- Sonde liveness decouplée de readiness : utilise `tcpSocket` au lieu de `httpGet /ready` pour eviter les crashloops lors d'incidents edge Cloudflare
+- Ajout TCP/7844 en egress dans la NetworkPolicy pour le fallback HTTP/2
+- ServiceMonitor echoue a l'installation si `metrics.service.enabled` n'est pas active
 
 ## [0.4.0] - 2026-06-03
 

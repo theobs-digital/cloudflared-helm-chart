@@ -7,7 +7,7 @@ A minimal, security-hardened Helm chart for deploying [Cloudflare Tunnel](https:
 - Security-first defaults: non-root, read-only filesystem, writable `/tmp`, dropped capabilities, seccomp profile
 - PodDisruptionBudget for high availability
 - Zero-downtime rolling updates
-- Liveness and readiness probes via the built-in metrics server
+- Decoupled probes: liveness (tcpSocket) tolerates edge outages, readiness (httpGet /ready) gates traffic
 - Pod anti-affinity to spread replicas across nodes
 - Support for existing secrets (Vault, External Secrets, SealedSecret, etc.)
 - Optional NetworkPolicy with configurable namespace-level egress
@@ -120,8 +120,8 @@ helm uninstall cloudflared -n cloudflared
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `livenessProbe.httpGet.path` | Liveness probe path | `/ready` |
-| `livenessProbe.httpGet.port` | Liveness probe port | `2000` |
+| `livenessProbe.tcpSocket.port` | Liveness probe port (tcpSocket) | `2000` |
+| `livenessProbe.failureThreshold` | Failures before restart (~2 min tolerance) | `6` |
 | `readinessProbe.httpGet.path` | Readiness probe path | `/ready` |
 | `readinessProbe.httpGet.port` | Readiness probe port | `2000` |
 
@@ -141,13 +141,20 @@ helm uninstall cloudflared -n cloudflared
 | `networkPolicy.enabled` | Enable NetworkPolicy | `false` |
 | `networkPolicy.allowedNamespaces` | Namespaces cloudflared can reach (`["*"]` for all) | `["*"]` |
 
+When enabled, the NetworkPolicy allows:
+- **Ingress**: TCP/2000 (metrics and probes) from any source
+- **Egress**: UDP/7844 + TCP/7844 (Cloudflare tunnel), TCP/443 (Cloudflare API), UDP+TCP/53 (DNS)
+- **Egress backends**: all pods in `allowedNamespaces` on all ports
+
+Set `allowedNamespaces` to specific namespaces (e.g. `["production", "staging"]`) to restrict which backends cloudflared can reach.
+
 ### Metrics and Observability
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `metrics.service.enabled` | Create a ClusterIP Service for metrics | `false` |
 | `metrics.service.port` | Metrics service port | `2000` |
-| `metrics.serviceMonitor.enabled` | Create a Prometheus ServiceMonitor | `false` |
+| `metrics.serviceMonitor.enabled` | Create a Prometheus ServiceMonitor (requires `metrics.service.enabled`) | `false` |
 | `metrics.serviceMonitor.interval` | Scrape interval | `30s` |
 | `metrics.serviceMonitor.additionalLabels` | Additional labels on the ServiceMonitor | `{}` |
 | `opentelemetry.enabled` | Add prometheus.io annotations for OTEL collector discovery | `false` |
@@ -160,6 +167,13 @@ helm uninstall cloudflared -n cloudflared
 | `tolerations` | Tolerations | `[]` |
 | `podAnnotations` | Pod annotations | `{}` |
 | `podLabels` | Pod labels | `{}` |
+
+## Design notes
+
+- **Liveness vs readiness**: liveness uses `tcpSocket` (process alive?) while readiness uses `httpGet /ready` (tunnel connected?). This prevents crashloops during Cloudflare edge outages — pods stay alive but are removed from Services until the tunnel reconnects.
+- **Anti-affinity**: `preferredDuringScheduling` by default so the chart works on single-node clusters. On multi-node clusters, replicas are spread across nodes but scheduling is not blocked if spreading is impossible.
+- **PDB**: auto-disabled when `replicaCount: 1` to avoid blocking node drains.
+- **Security context**: `runAsNonRoot`/`runAsUser`/`runAsGroup` are set at both pod and container level intentionally for defense-in-depth.
 
 ## License
 
