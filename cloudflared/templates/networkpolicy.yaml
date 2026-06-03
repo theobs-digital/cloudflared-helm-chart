@@ -42,4 +42,7 @@ spec:
               kubernetes.io/metadata.name: {{ . }}
     {{- end }}
     {{- end }}
+    {{- with .Values.networkPolicy.additionalEgress }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 {{- end }}

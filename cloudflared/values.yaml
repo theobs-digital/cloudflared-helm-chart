@@ -79,6 +79,14 @@ terminationGracePeriodSeconds: 30
 networkPolicy:
   enabled: false
   allowedNamespaces: ["*"]
+  additionalEgress: []
+  # - to:
+  #     - podSelector:
+  #         matchLabels:
+  #           app: backend
+  #   ports:
+  #     - protocol: TCP
+  #       port: 8080
 
 metrics:
   service:

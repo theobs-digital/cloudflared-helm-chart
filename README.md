@@ -140,13 +140,14 @@ helm uninstall cloudflared -n cloudflared
 |-----------|-------------|---------|
 | `networkPolicy.enabled` | Enable NetworkPolicy | `false` |
 | `networkPolicy.allowedNamespaces` | Namespaces cloudflared can reach (`["*"]` for all) | `["*"]` |
+| `networkPolicy.additionalEgress` | Additional raw egress rules for fine-grained control (pod labels, IP blocks, ports) | `[]` |
 
 When enabled, the NetworkPolicy allows:
 - **Ingress**: TCP/2000 (metrics and probes) from any source
 - **Egress**: UDP/7844 + TCP/7844 (Cloudflare tunnel), TCP/443 (Cloudflare API), UDP+TCP/53 (DNS)
 - **Egress backends**: all pods in `allowedNamespaces` on all ports
 
-Set `allowedNamespaces` to specific namespaces (e.g. `["production", "staging"]`) to restrict which backends cloudflared can reach.
+Set `allowedNamespaces` to specific namespaces (e.g. `["production", "staging"]`) to restrict which backends cloudflared can reach. For fine-grained control (pod labels, IP blocks, specific ports), use `additionalEgress` with raw NetworkPolicy rules.
 
 ### Metrics and Observability
 
