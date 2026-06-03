@@ -1,0 +1,33 @@
+name: Lint and Test Charts
+
+on:
+  pull_request:
+    paths:
+      - "cloudflared/**"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Helm lint
+        run: helm lint ./cloudflared
+
+      - name: Helm template (default)
+        run: helm template test ./cloudflared --set cloudflared.tunnelToken=test
+
+      - name: Helm template (all features)
+        run: |
+          helm template test ./cloudflared \
+            --set cloudflared.tunnelToken=test \
+            --set networkPolicy.enabled=true \
+            --set metrics.service.enabled=true \
+            --set metrics.serviceMonitor.enabled=true \
+            --set opentelemetry.enabled=true
