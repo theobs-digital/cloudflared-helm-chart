@@ -7,6 +7,28 @@ entries:
           image: cloudflare/cloudflared:2026.5.2
     apiVersion: v2
     appVersion: 2026.5.2
+    created: "2026-06-04T02:23:35.209200284Z"
+    description: Helm chart for deploying Cloudflare Tunnel (cloudflared)
+    digest: e70e90f4bd5dedec32ec3e5d4012db17e32a777b70cda5c4bf18db114608509a
+    icon: https://raw.githubusercontent.com/theobs-digital/cloudflared-helm-chart/main/cloudflared/icon.png
+    keywords:
+    - cloudflare
+    - tunnel
+    - cloudflared
+    - ingress
+    name: cloudflared
+    sources:
+    - https://github.com/theobs-digital/cloudflared-helm-chart
+    type: application
+    urls:
+    - https://github.com/theobs-digital/cloudflared-helm-chart/releases/download/cloudflared-0.4.4/cloudflared-0.4.4.tgz
+    version: 0.4.4
+  - annotations:
+      artifacthub.io/images: |
+        - name: cloudflared
+          image: cloudflare/cloudflared:2026.5.2
+    apiVersion: v2
+    appVersion: 2026.5.2
     created: "2026-06-03T12:18:31.816989937Z"
     description: Helm chart for deploying Cloudflare Tunnel (cloudflared)
     digest: 8ea4953bf6b3c06cfeb54fd271718a91ecaa9640408b6c2226bf13e43b816fcb
@@ -45,4 +67,4 @@ entries:
     urls:
     - https://github.com/theobs-digital/cloudflared-helm-chart/releases/download/cloudflared-0.4.2/cloudflared-0.4.2.tgz
     version: 0.4.2
-generated: "2026-06-03T12:18:31.817001254Z"
+generated: "2026-06-04T02:23:35.209213439Z"
