@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.4] - 2026-06-04
+
+### Fixed
+- Include README.md and CHANGELOG.md in chart package for ArtifactHub display
+
 ## [0.4.3] - 2026-06-03
 
 ### Fixed
@@ -61,6 +66,11 @@
 ---
 
 # Journal des modifications
+
+## [0.4.4] - 2026-06-04
+
+### Corrections
+- Inclusion de README.md et CHANGELOG.md dans le package du chart pour l'affichage sur ArtifactHub
 
 ## [0.4.3] - 2026-06-03
 
