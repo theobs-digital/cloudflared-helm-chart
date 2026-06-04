@@ -1,5 +1,7 @@
 # Cloudflared Helm Chart
 
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/cloudflared)](https://artifacthub.io/packages/search?repo=cloudflared)
+
 A minimal, security-hardened Helm chart for deploying [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) (`cloudflared`) on Kubernetes.
 
 ## Features
