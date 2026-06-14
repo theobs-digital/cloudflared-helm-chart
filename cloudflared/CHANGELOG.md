@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.5] - 2026-06-14
+
+### Changed
+- Bump cloudflared to 2026.6.0 (CVE patches)
+
 ## [0.4.4] - 2026-06-04
 
 ### Fixed
@@ -66,6 +71,11 @@
 ---
 
 # Journal des modifications
+
+## [0.4.5] - 2026-06-14
+
+### Modifications
+- Mise a jour de cloudflared vers 2026.6.0 (correctifs CVE)
 
 ## [0.4.4] - 2026-06-04
 
