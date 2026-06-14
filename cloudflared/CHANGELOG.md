@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.0] - 2026-06-14
+
+### Fixed
+- ServiceAccount name now derives from the release fullname (default `name: ""`) instead of a hardcoded `cloudflared-sa`, which collided when several releases shared a namespace
+- Metrics Service `targetPort` now points at the named container port `metrics` instead of following `metrics.service.port`, so changing the service port no longer breaks routing
+
+### Changed
+- **Breaking**: existing installs get a renamed ServiceAccount on upgrade (`cloudflared-sa` → `<release>-cloudflared`); re-apply any annotations (e.g. IRSA/Workload Identity) set on the old SA
+
 ## [0.4.5] - 2026-06-14
 
 ### Changed
@@ -71,6 +80,15 @@
 ---
 
 # Journal des modifications
+
+## [0.5.0] - 2026-06-14
+
+### Corrections
+- Le nom du ServiceAccount derive desormais du fullname de la release (defaut `name: ""`) au lieu d'un `cloudflared-sa` code en dur, qui entrait en collision lorsque plusieurs releases partageaient un namespace
+- Le `targetPort` du Service metrics pointe maintenant vers le port conteneur nomme `metrics` au lieu de suivre `metrics.service.port`, donc changer le port du service ne casse plus le routage
+
+### Modifications
+- **Rupture** : les installs existants voient leur ServiceAccount renomme a l'upgrade (`cloudflared-sa` → `<release>-cloudflared`) ; reappliquer les annotations (ex. IRSA/Workload Identity) posees sur l'ancien SA
 
 ## [0.4.5] - 2026-06-14
 

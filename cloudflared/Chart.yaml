@@ -2,7 +2,7 @@ apiVersion: v2
 name: cloudflared
 description: Helm chart for deploying Cloudflare Tunnel (cloudflared)
 type: application
-version: 0.4.5
+version: 0.5.0
 appVersion: "2026.6.0"
 keywords:
   - cloudflare

@@ -10,7 +10,7 @@ spec:
   ports:
     - name: metrics
       port: {{ .Values.metrics.service.port }}
-      targetPort: {{ .Values.metrics.service.port }}
+      targetPort: metrics
       protocol: TCP
   selector:
     {{- include "cloudflared.selectorLabels" . | nindent 4 }}

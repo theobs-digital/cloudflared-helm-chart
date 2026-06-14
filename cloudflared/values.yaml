@@ -18,7 +18,9 @@ fullnameOverride: ""
 serviceAccount:
   enabled: true
   annotations: {}
-  name: "cloudflared-sa"
+  # Leave empty to derive a per-release name from the chart fullname.
+  # A hardcoded name collides when several releases share a namespace.
+  name: ""
   automountServiceAccountToken: false
 
 podAnnotations: {}

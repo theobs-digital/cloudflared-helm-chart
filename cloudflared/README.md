@@ -90,7 +90,7 @@ helm uninstall cloudflared -n cloudflared
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `serviceAccount.enabled` | Create a service account | `true` |
-| `serviceAccount.name` | Service account name | `cloudflared-sa` |
+| `serviceAccount.name` | Service account name (empty = derived from release fullname) | `""` |
 | `serviceAccount.annotations` | Service account annotations | `{}` |
 | `serviceAccount.automountServiceAccountToken` | Automount API token | `false` |
 
