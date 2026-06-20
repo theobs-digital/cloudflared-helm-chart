@@ -3,7 +3,7 @@
 ## [0.5.1] - 2026-06-20
 
 ### Changed
-- Bump cloudflared to 2026.6.1
+- Bump cloudflared to 2026.6.1 (CVE patches)
 
 ## [0.5.0] - 2026-06-14
 
@@ -89,7 +89,7 @@
 ## [0.5.1] - 2026-06-20
 
 ### Modifications
-- Mise a jour de cloudflared vers 2026.6.1
+- Mise a jour de cloudflared vers 2026.6.1 (correctifs CVE)
 
 ## [0.5.0] - 2026-06-14
 
