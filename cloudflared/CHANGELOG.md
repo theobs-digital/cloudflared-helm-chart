@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.1] - 2026-06-20
+
+### Changed
+- Bump cloudflared to 2026.6.1
+
 ## [0.5.0] - 2026-06-14
 
 ### Fixed
@@ -80,6 +85,11 @@
 ---
 
 # Journal des modifications
+
+## [0.5.1] - 2026-06-20
+
+### Modifications
+- Mise a jour de cloudflared vers 2026.6.1
 
 ## [0.5.0] - 2026-06-14
 
