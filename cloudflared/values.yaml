@@ -33,6 +33,14 @@ podLabels: {}
 cloudflared:
   tunnelToken: ""
   existingSecret: ""
+  # Extra environment variables for the cloudflared container. Every
+  # `tunnel run` flag has a TUNNEL_* equivalent, listed at
+  # https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/run-parameters/
+  extraEnv: []
+  # - name: TUNNEL_LOG_OUTPUT        # --output json, for log collectors
+  #   value: json
+  # - name: TUNNEL_EDGE_IP_VERSION   # IPv4-only clusters (default is auto)
+  #   value: "4"
 
 livenessProbe:
   tcpSocket:
@@ -52,6 +60,13 @@ podSecurityContext:
   runAsNonRoot: true
   runAsUser: 65532
   runAsGroup: 65532
+  # Lets cloudflared open unprivileged ICMP sockets, so ping and traceroute
+  # reach private networks behind the tunnel. The range must include
+  # runAsGroup. Safe sysctl: allowed by the kubelet and by Pod Security
+  # "restricted" without extra configuration. Set to [] to disable.
+  sysctls:
+    - name: net.ipv4.ping_group_range
+      value: "65532 65532"
 
 securityContext:
   allowPrivilegeEscalation: false
@@ -76,7 +91,10 @@ podDisruptionBudget:
   enabled: true
   minAvailable: 1
 
-terminationGracePeriodSeconds: 30
+# Must exceed cloudflared's own --grace-period (30s by default,
+# TUNNEL_GRACE_PERIOD): the kubelet sends SIGKILL when this expires, cutting
+# requests that are still draining.
+terminationGracePeriodSeconds: 45
 
 networkPolicy:
   enabled: false

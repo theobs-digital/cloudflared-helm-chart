@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.0] - 2026-10-10
+
+### Added
+- `cloudflared.extraEnv` to pass any `tunnel run` flag through its `TUNNEL_*` environment variable (e.g. `TUNNEL_LOG_OUTPUT=json`, `TUNNEL_EDGE_IP_VERSION=4`)
+- `net.ipv4.ping_group_range` sysctl in the default `podSecurityContext`, as in Cloudflare's Kubernetes guide: ping and traceroute now reach private networks behind the tunnel
+- README: installation from the Helm repository (`helm repo add`)
+
+### Changed
+- Bump cloudflared to 2026.10.0 (CVE patches)
+- `terminationGracePeriodSeconds` default raised from 30 to 45, so the kubelet no longer kills cloudflared before its own 30s grace period ends
+- **Note**: clusters that forbid pod sysctls (admission policy, sandboxed runtime) must set `podSecurityContext.sysctls: []`, otherwise new pods are rejected and the rollout stays on the old ones
+
 ## [0.5.1] - 2026-06-20
 
 ### Changed
@@ -85,6 +97,18 @@
 ---
 
 # Journal des modifications
+
+## [0.6.0] - 2026-10-10
+
+### Ajouts
+- `cloudflared.extraEnv` pour passer n'importe quel flag de `tunnel run` via sa variable d'environnement `TUNNEL_*` (ex. `TUNNEL_LOG_OUTPUT=json`, `TUNNEL_EDGE_IP_VERSION=4`)
+- Sysctl `net.ipv4.ping_group_range` dans le `podSecurityContext` par defaut, comme dans le guide Kubernetes de Cloudflare : ping et traceroute atteignent desormais les reseaux prives derriere le tunnel
+- README : installation depuis le depot Helm (`helm repo add`)
+
+### Modifications
+- Mise a jour de cloudflared vers 2026.10.0 (correctifs CVE)
+- `terminationGracePeriodSeconds` passe de 30 a 45 par defaut, pour que le kubelet ne tue plus cloudflared avant la fin de son propre delai de grace de 30s
+- **Note** : les clusters qui interdisent les sysctls de pod (politique d'admission, runtime sandboxe) doivent definir `podSecurityContext.sysctls: []`, sinon les nouveaux pods sont refuses et le rollout reste sur les anciens
 
 ## [0.5.1] - 2026-06-20
 

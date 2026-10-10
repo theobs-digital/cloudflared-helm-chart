@@ -70,6 +70,9 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.cloudflared.existingSecret | default (printf "%s-secret" (include "cloudflared.fullname" .)) }}
                   key: tunnelToken
+            {{- with .Values.cloudflared.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}

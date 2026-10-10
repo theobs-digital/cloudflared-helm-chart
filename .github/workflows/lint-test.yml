@@ -30,4 +30,6 @@ jobs:
             --set networkPolicy.enabled=true \
             --set metrics.service.enabled=true \
             --set metrics.serviceMonitor.enabled=true \
-            --set opentelemetry.enabled=true
+            --set opentelemetry.enabled=true \
+            --set cloudflared.extraEnv[0].name=TUNNEL_LOG_OUTPUT \
+            --set cloudflared.extraEnv[0].value=json

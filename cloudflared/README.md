@@ -12,6 +12,8 @@ A minimal, security-hardened Helm chart for deploying [Cloudflare Tunnel](https:
 - Decoupled probes: liveness (tcpSocket) tolerates edge outages, readiness (httpGet /ready) gates traffic
 - Pod anti-affinity to spread replicas across nodes
 - Support for existing secrets (Vault, External Secrets, SealedSecret, etc.)
+- ICMP proxying (ping, traceroute) to private networks through a safe sysctl
+- Any cloudflared flag through `extraEnv`
 - Optional NetworkPolicy with configurable namespace-level egress
 - Optional Prometheus metrics Service and ServiceMonitor
 - Optional OpenTelemetry annotations for automatic scraping
@@ -24,10 +26,19 @@ A minimal, security-hardened Helm chart for deploying [Cloudflare Tunnel](https:
 
 ## Installation
 
+Add the Helm repository:
+
+```bash
+helm repo add cloudflared https://theobs-digital.github.io/cloudflared-helm-chart
+helm repo update
+```
+
+To install from a clone of this repository instead, replace `cloudflared/cloudflared` with `./cloudflared` in the commands below.
+
 ### With tunnel token
 
 ```bash
-helm install cloudflared ./cloudflared \
+helm install cloudflared cloudflared/cloudflared \
   --namespace cloudflared \
   --create-namespace \
   --set cloudflared.tunnelToken="<your-tunnel-token>"
@@ -40,7 +51,7 @@ kubectl create secret generic my-tunnel-secret \
   --from-literal=tunnelToken="<your-tunnel-token>" \
   -n cloudflared
 
-helm install cloudflared ./cloudflared \
+helm install cloudflared cloudflared/cloudflared \
   --namespace cloudflared \
   --create-namespace \
   --set cloudflared.existingSecret=my-tunnel-secret
@@ -49,13 +60,28 @@ helm install cloudflared ./cloudflared \
 ### With OpenTelemetry and metrics
 
 ```bash
-helm install cloudflared ./cloudflared \
+helm install cloudflared cloudflared/cloudflared \
   --namespace cloudflared \
   --create-namespace \
   --set cloudflared.tunnelToken="<your-tunnel-token>" \
   --set opentelemetry.enabled=true \
   --set metrics.service.enabled=true \
   --set metrics.serviceMonitor.enabled=true
+```
+
+### With extra cloudflared flags
+
+Every [`tunnel run` parameter](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/run-parameters/) has a `TUNNEL_*` environment variable. Pass them through `cloudflared.extraEnv`:
+
+```yaml
+cloudflared:
+  extraEnv:
+    - name: TUNNEL_LOG_OUTPUT          # JSON logs, for log collectors
+      value: json
+    - name: TUNNEL_EDGE_IP_VERSION     # IPv4-only clusters (default is auto since cloudflared 2026.4.0)
+      value: "4"
+    - name: TUNNEL_TRANSPORT_PROTOCOL  # when UDP/7844 is blocked
+      value: http2
 ```
 
 ## Uninstall
@@ -84,6 +110,7 @@ helm uninstall cloudflared -n cloudflared
 |-----------|-------------|---------|
 | `cloudflared.tunnelToken` | Cloudflare Tunnel token (required if `existingSecret` is not set) | `""` |
 | `cloudflared.existingSecret` | Name of an existing Secret containing a `tunnelToken` key | `""` |
+| `cloudflared.extraEnv` | Extra environment variables, e.g. `TUNNEL_*` equivalents of `tunnel run` flags | `[]` |
 
 ### Service Account
 
@@ -101,6 +128,7 @@ helm uninstall cloudflared -n cloudflared
 | `podSecurityContext.runAsNonRoot` | Run as non-root user | `true` |
 | `podSecurityContext.runAsUser` | User ID | `65532` |
 | `podSecurityContext.runAsGroup` | Group ID | `65532` |
+| `podSecurityContext.sysctls` | Pod sysctls; the default enables ICMP proxying (set `[]` to disable) | `net.ipv4.ping_group_range: "65532 65532"` |
 | `securityContext.allowPrivilegeEscalation` | Allow privilege escalation | `false` |
 | `securityContext.readOnlyRootFilesystem` | Read-only root filesystem | `true` |
 | `securityContext.capabilities.drop` | Dropped capabilities | `["ALL"]` |
@@ -115,7 +143,7 @@ helm uninstall cloudflared -n cloudflared
 | `strategy.rollingUpdate.maxSurge` | Max extra pods during update | `1` |
 | `podDisruptionBudget.enabled` | Enable PDB (auto-disabled when `replicaCount` is 1) | `true` |
 | `podDisruptionBudget.minAvailable` | Minimum available pods | `1` |
-| `terminationGracePeriodSeconds` | Grace period for pod termination | `30` |
+| `terminationGracePeriodSeconds` | Grace period for pod termination (must exceed cloudflared's `--grace-period`) | `45` |
 | `affinity` | Affinity rules (anti-affinity preferred by default) | see `values.yaml` |
 
 ### Probes
@@ -177,6 +205,8 @@ Set `allowedNamespaces` to specific namespaces (e.g. `["production", "staging"]`
 - **Anti-affinity**: `preferredDuringScheduling` by default so the chart works on single-node clusters. On multi-node clusters, replicas are spread across nodes but scheduling is not blocked if spreading is impossible.
 - **PDB**: auto-disabled when `replicaCount: 1` to avoid blocking node drains.
 - **Security context**: `runAsNonRoot`/`runAsUser`/`runAsGroup` are set at both pod and container level intentionally for defense-in-depth.
+- **ICMP sysctl**: `net.ipv4.ping_group_range` lets the non-root process open ICMP sockets, so ping and traceroute reach private networks behind the tunnel (same setting as Cloudflare's Kubernetes guide). It is a safe sysctl, allowed by the kubelet and Pod Security `restricted` by default. The range must include `runAsGroup`. On clusters that forbid pod sysctls (admission policy, sandboxed runtime), set `podSecurityContext.sysctls: []`.
+- **Termination grace period**: on SIGTERM, cloudflared stops accepting requests and drains in-flight ones for up to `--grace-period` (30s by default). `terminationGracePeriodSeconds` is set above that so the kubelet's SIGKILL does not cut the drain. If you raise `TUNNEL_GRACE_PERIOD`, raise `terminationGracePeriodSeconds` too.
 
 ## License
 
